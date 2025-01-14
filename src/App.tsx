@@ -7,7 +7,30 @@ import {
   FaShopSlash,
 } from "react-icons/fa6";
 import DataTable from "./components/DataTable";
+import { observer } from "mobx-react-lite";
+import inventoryStore from "./store/inventory";
 function App() {
+  const Counter = observer(() => {
+    return (
+      <div>
+        <h1>Count: {JSON.stringify(inventoryStore.data, null, 2)}</h1>
+        <button
+          className="ml-4"
+          onClick={() => {
+            inventoryStore.addItem({
+              name: "Abhishek",
+              category: "New",
+              price: "$300",
+              quantity: "3",
+              value: "400",
+            });
+          }}
+        >
+          ADD ITEM
+        </button>
+      </div>
+    );
+  });
   return (
     <>
       <div>
@@ -25,6 +48,7 @@ function App() {
         </div>
         <DataTable />
       </div>
+      <Counter />
     </>
   );
 }
