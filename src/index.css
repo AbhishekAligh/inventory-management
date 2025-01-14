@@ -1,0 +1,10 @@
+@tailwind base;
+@layer base {
+  html {
+    @apply text-white;
+    @apply bg-[#161819];
+    @apply p-4;
+  }
+}
+@tailwind components;
+@tailwind utilities;
