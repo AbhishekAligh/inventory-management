@@ -1,45 +1,45 @@
-import { useEffect, useState } from "react";
-import { FaEye, FaPencil, FaTrash } from "react-icons/fa6";
+import { FaEye, FaEyeSlash, FaPencil, FaTrash } from "react-icons/fa6";
 import useUserStore from "../store/userRole";
+import useInventoryStore from "../store/inventoryStore";
 
 export default function DataTable() {
-  //   const data = [
-  //     {
-  //       name: "Bluetooth",
-  //       category: "Electronic",
-  //       value: "$150",
-  //       quantity: 5,
-  //       price: "$30",
-  //     },
-  //     {
-  //       name: "Edifier M43560",
-  //       category: "Electronic",
-  //       value: "0",
-  //       quantity: 0,
-  //       price: "$0",
-  //     },
-  //     {
-  //       name: "Sony 4k ultra 55 inch TV",
-  //       category: "Electronic",
-  //       value: "$1190",
-  //       quantity: 17,
-  //       price: "$70",
-  //     },
-  //     {
-  //       name: "Samsumg 55 inch TV",
-  //       category: "Electronic",
-  //       value: "$600",
-  //       quantity: 50,
-  //       price: "$12",
-  //     },
-  //     {
-  //       name: "samsumg S34 Ultra",
-  //       category: "phone",
-  //       value: "$0",
-  //       quantity: 0,
-  //       price: "$0",
-  //     },
-  //   ];
+  // const data = [
+  //   {
+  //     name: "Bluetooth",
+  //     category: "Electronic",
+  //     value: "$150",
+  //     quantity: 5,
+  //     price: "$30",
+  //   },
+  //   {
+  //     name: "Edifier M43560",
+  //     category: "Electronic",
+  //     value: "0",
+  //     quantity: 0,
+  //     price: "$0",
+  //   },
+  //   {
+  //     name: "Sony 4k ultra 55 inch TV",
+  //     category: "Electronic",
+  //     value: "$1190",
+  //     quantity: 17,
+  //     price: "$70",
+  //   },
+  //   {
+  //     name: "Samsumg 55 inch TV",
+  //     category: "Electronic",
+  //     value: "$600",
+  //     quantity: 50,
+  //     price: "$12",
+  //   },
+  //   {
+  //     name: "samsumg S34 Ultra",
+  //     category: "phone",
+  //     value: "$0",
+  //     quantity: 0,
+  //     price: "$0",
+  //   },
+  // ];
 
   const tableHeaders = [
     "Name",
@@ -50,20 +50,22 @@ export default function DataTable() {
     "Action",
   ];
   const userStore = useUserStore();
-  interface IProducts {
-    name: string;
-    category: string;
-    value: number;
-    quantity: number;
-    price: number;
-  }
-  const [data, setData] = useState([]);
-  useEffect(() => {
-    fetch("https://dev-0tf0hinghgjl39z.api.raw-labs.com/inventory")
-      .then((response) => response.json())
-      .then((json) => setData(json));
-  }, []);
-  if (data && data.length > 0) {
+  const inventoryStore = useInventoryStore();
+  console.log("🚀 ~ DataTable ~ inventoryStore:", inventoryStore);
+  // interface IProducts {
+  //   name: string;
+  //   category: string;
+  //   value: number;
+  //   quantity: number;
+  //   price: number;
+  // }
+  // const [data, setData] = useState([]);
+  // useEffect(() => {
+  //   fetch("https://dev-0tf0hinghgjl39z.api.raw-labs.com/inventory")
+  //     .then((response) => response.json())
+  //     .then((json) => setData(json));
+  // }, []);
+  if (inventoryStore.items && inventoryStore.items.length > 0) {
     return (
       <div className="mt-4 bg-[#252528] rounded-lg p-4 overflow-x-auto">
         <table className="divide-y divide-gray-700 w-full">
@@ -79,10 +81,12 @@ export default function DataTable() {
             </tr>
           </thead>
           <tbody className="">
-            {data.map((item: IProducts, index) => (
+            {inventoryStore.items.map((item, index) => (
               <tr
                 key={index}
-                className="grid grid-cols-6  h-14 border-y border-gray-600 items-center"
+                className={`grid grid-cols-6 h-14 border-y border-gray-600 items-center ${
+                  item.disabled ? "text-gray-500" : ""
+                }`}
               >
                 <td className="">{item.name}</td>
                 <td className="">{item.category}</td>
@@ -90,21 +94,38 @@ export default function DataTable() {
                 <td className="">{item.quantity}</td>
                 <td className="">{item.price}</td>
                 <td className="flex  gap-4 text-gray-500">
-                  <button onClick={() => console.log("Meow")}>
+                  <button
+                    disabled={!userStore.isAdmin}
+                    onClick={() => console.log("Meow")}
+                  >
                     <FaPencil
                       className={
-                        userStore.isAdmin ? "text-green-500" : "text-gray-600"
+                        userStore.isAdmin && !item.disabled
+                          ? "text-green-500"
+                          : "text-gray-600"
                       }
                     />
                   </button>
-                  <button>
-                    <FaEye
-                      className={
-                        userStore.isAdmin ? "text-purple-500" : "text-gray-600"
-                      }
-                    />
+                  <button
+                    onClick={() => inventoryStore.disableItem(item.name)}
+                    disabled={!userStore.isAdmin}
+                  >
+                    {userStore.isAdmin && !item.disabled ? (
+                      <FaEye
+                        className={
+                          userStore.isAdmin
+                            ? "text-purple-500"
+                            : "text-gray-600"
+                        }
+                      />
+                    ) : (
+                      <FaEyeSlash className="text-purple-500" />
+                    )}
                   </button>
-                  <button>
+                  <button
+                    disabled={!userStore.isAdmin}
+                    onClick={() => inventoryStore.deleteItem(item.name)}
+                  >
                     <FaTrash
                       className={
                         userStore.isAdmin ? "text-red-500" : "text-gray-600"

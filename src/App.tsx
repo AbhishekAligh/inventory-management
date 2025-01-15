@@ -7,6 +7,7 @@ import {
   FaShopSlash,
 } from "react-icons/fa6";
 import DataTable from "./components/DataTable";
+
 function App() {
   return (
     <>
