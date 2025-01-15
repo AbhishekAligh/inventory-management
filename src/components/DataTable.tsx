@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FaEye, FaPencil, FaTrash } from "react-icons/fa6";
+import useUserStore from "../store/userRole";
 
 export default function DataTable() {
   //   const data = [
@@ -48,6 +49,7 @@ export default function DataTable() {
     "Price",
     "Action",
   ];
+  const userStore = useUserStore();
   interface IProducts {
     name: string;
     category: string;
@@ -89,13 +91,25 @@ export default function DataTable() {
                 <td className="">{item.price}</td>
                 <td className="flex  gap-4 text-gray-500">
                   <button onClick={() => console.log("Meow")}>
-                    <FaPencil />
+                    <FaPencil
+                      className={
+                        userStore.isAdmin ? "text-green-500" : "text-gray-600"
+                      }
+                    />
                   </button>
                   <button>
-                    <FaEye />
+                    <FaEye
+                      className={
+                        userStore.isAdmin ? "text-purple-500" : "text-gray-600"
+                      }
+                    />
                   </button>
                   <button>
-                    <FaTrash />
+                    <FaTrash
+                      className={
+                        userStore.isAdmin ? "text-red-500" : "text-gray-600"
+                      }
+                    />
                   </button>
                 </td>
               </tr>
