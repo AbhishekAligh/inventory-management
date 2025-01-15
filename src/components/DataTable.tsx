@@ -1,70 +1,25 @@
-import { FaEye, FaEyeSlash, FaPencil, FaTrash } from "react-icons/fa6";
+import {
+  FaEye,
+  FaEyeSlash,
+  FaPencil,
+  FaTrash,
+  FaTriangleExclamation,
+} from "react-icons/fa6";
 import useUserStore from "../store/userRole";
 import useInventoryStore from "../store/inventoryStore";
 
 export default function DataTable() {
-  // const data = [
-  //   {
-  //     name: "Bluetooth",
-  //     category: "Electronic",
-  //     value: "$150",
-  //     quantity: 5,
-  //     price: "$30",
-  //   },
-  //   {
-  //     name: "Edifier M43560",
-  //     category: "Electronic",
-  //     value: "0",
-  //     quantity: 0,
-  //     price: "$0",
-  //   },
-  //   {
-  //     name: "Sony 4k ultra 55 inch TV",
-  //     category: "Electronic",
-  //     value: "$1190",
-  //     quantity: 17,
-  //     price: "$70",
-  //   },
-  //   {
-  //     name: "Samsumg 55 inch TV",
-  //     category: "Electronic",
-  //     value: "$600",
-  //     quantity: 50,
-  //     price: "$12",
-  //   },
-  //   {
-  //     name: "samsumg S34 Ultra",
-  //     category: "phone",
-  //     value: "$0",
-  //     quantity: 0,
-  //     price: "$0",
-  //   },
-  // ];
-
   const tableHeaders = [
     "Name",
     "Category",
-    "Value",
-    "Quantity",
     "Price",
+    "Quantity",
+    "Value",
     "Action",
   ];
+
   const userStore = useUserStore();
   const inventoryStore = useInventoryStore();
-  console.log("🚀 ~ DataTable ~ inventoryStore:", inventoryStore);
-  // interface IProducts {
-  //   name: string;
-  //   category: string;
-  //   value: number;
-  //   quantity: number;
-  //   price: number;
-  // }
-  // const [data, setData] = useState([]);
-  // useEffect(() => {
-  //   fetch("https://dev-0tf0hinghgjl39z.api.raw-labs.com/inventory")
-  //     .then((response) => response.json())
-  //     .then((json) => setData(json));
-  // }, []);
   if (inventoryStore.items && inventoryStore.items.length > 0) {
     return (
       <div className="mt-4 bg-[#252528] rounded-lg p-4 overflow-x-auto">
@@ -90,13 +45,17 @@ export default function DataTable() {
               >
                 <td className="">{item.name}</td>
                 <td className="">{item.category}</td>
-                <td className="">{item.value}</td>
-                <td className="">{item.quantity}</td>
                 <td className="">{item.price}</td>
+                <td className="">{item.quantity}</td>
+                <td className="">{item.value}</td>
                 <td className="flex  gap-4 text-gray-500">
                   <button
                     disabled={!userStore.isAdmin}
-                    onClick={() => console.log("Meow")}
+                    onClick={() =>
+                      inventoryStore.editItem(item.name, {
+                        name: "Abhishek modified this",
+                      })
+                    }
                   >
                     <FaPencil
                       className={
@@ -119,7 +78,13 @@ export default function DataTable() {
                         }
                       />
                     ) : (
-                      <FaEyeSlash className="text-purple-500" />
+                      <FaEyeSlash
+                        className={
+                          userStore.isAdmin
+                            ? "text-purple-500"
+                            : "text-gray-600"
+                        }
+                      />
                     )}
                   </button>
                   <button
@@ -140,6 +105,11 @@ export default function DataTable() {
       </div>
     );
   } else {
-    return <div> No Data</div>;
+    return (
+      <div className="flex justify-center items-center gap-2 text-3xl h-[80dvh]">
+        <FaTriangleExclamation />
+        No Data
+      </div>
+    );
   }
 }

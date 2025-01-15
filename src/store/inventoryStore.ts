@@ -13,13 +13,13 @@ interface IInventoryStore {
   items: IItems[];
   isLoading: boolean;
   disableItem: (name: string) => void;
-  editItem: (name: string, payload: IItems) => void;
+  editItem: (name: string, payload: object) => void;
   deleteItem: (name: string) => void;
   initializeStore: () => void;
   totalProducts?: () => number;
-  totalStoreValue?: number;
-  outOfStock?: number;
-  noOfCategories?: number;
+  totalStoreValue?: () => number;
+  outOfStock?: () => number;
+  noOfCategories?: () => number;
 }
 
 const useInventoryStore = create<IInventoryStore>((set) => ({
@@ -37,7 +37,7 @@ const useInventoryStore = create<IInventoryStore>((set) => ({
       set({ items: [] });
     }
   },
-  editItem: (name: string, payload: IItems) => {
+  editItem: (name: string, payload) => {
     set((state) => ({
       items: state.items.map((item) =>
         item.name === name ? { ...item, ...payload } : item
@@ -58,7 +58,20 @@ const useInventoryStore = create<IInventoryStore>((set) => ({
       items: state.items.filter((item) => item.name !== name),
     }));
   },
-  setItems: (newItems: IItems[]) => set({ items: newItems }),
+  totalProducts: (): number => useInventoryStore.getState().items.length,
+  totalStoreValue: (): number =>
+    useInventoryStore
+      .getState()
+      .items.reduce(
+        (total, item) => total + parseFloat(item.value.replace("$", "")),
+        0
+      ),
+  outOfStock: (): number =>
+    useInventoryStore.getState().items.filter((item) => item.quantity == "0")
+      .length,
+  noOfCategories: (): number =>
+    new Set(useInventoryStore.getState().items.map((item) => item.category))
+      .size,
 }));
 useInventoryStore.getState().initializeStore();
 export default useInventoryStore;

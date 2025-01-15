@@ -1,7 +1,7 @@
 export default function WidgetCard(props: {
   icon?: React.FC;
   title: string;
-  count: string;
+  count: number;
 }) {
   const { icon: Icon, title, count } = props;
   return (
@@ -14,4 +14,3 @@ export default function WidgetCard(props: {
     </div>
   );
 }
-
