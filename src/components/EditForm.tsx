@@ -9,55 +9,70 @@ import {
   Fieldset,
   Description,
 } from "@headlessui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import { IItem } from "../store/inventoryStore";
 
-function EditForm() {
-  const [isOpen, setIsOpen] = useState(false);
+interface EditModalFormProps {
+  initialState: IItem | null;
+  onClose: () => void;
+  onSave: (updatedForm: IItem | null) => void;
+  isOpen: boolean;
+}
+
+function EditForm(props: EditModalFormProps) {
+  const { initialState, onClose, onSave, isOpen } = props;
 
   // State to hold form data
-  const [formData, setFormData] = useState({
-    category: "",
-    price: "",
-    quantity: "",
-    value: "",
-  });
+  const [formData, setFormData] = useState<IItem | null>(null);
+
+  useEffect(() => {
+    setFormData(initialState);
+  }, [initialState]);
 
   // Handler to update form state
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (!formData) {
+      return;
+    }
+    setFormData((prevState) => {
+      if (!prevState) {
+        return null;
+      }
+      if (name === "price" || name === "value") {
+        return {
+          ...prevState,
+          [name]: `$${value}`,
+        };
+      }
+      return {
+        ...prevState,
+        [name]: name === "quantity" ? parseFloat(value) : value,
+      };
+    });
   };
 
   // Handler for Save button
   const handleSave = () => {
     console.log("Form Data:", formData);
-    setIsOpen(false);
-    // Display or process the form data as needed
+    onSave(formData);
   };
 
   return ReactDOM.createPortal(
     <>
-      <button onClick={() => setIsOpen(true)}>Open dialog</button>
-      <Dialog
-        open={isOpen}
-        onClose={() => setIsOpen(false)}
-        className="relative z-50"
-      >
+      <Dialog open={isOpen} onClose={onClose} className="relative z-50">
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm"></div>
         <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
           <DialogPanel className="max-w-lg space-y-4 bg-[#2E312C] rounded-xl py-8 px-6">
             <div className="flex justify-between items-center">
               <div>
                 <DialogTitle className="font-bold">Edit Product</DialogTitle>
-                <Description>Product/Item name</Description>
+                <Description>{formData?.name}</Description>
               </div>
               <Button
                 className="rounded bg-[#2C2D2B] py-2 px-4 text-lg font-bold text-[#9DA758] data-[active]:bg-sky-700"
-                onClick={() => setIsOpen(false)}
+                onClick={onClose}
               >
                 X
               </Button>
@@ -68,7 +83,7 @@ function EditForm() {
                 <Input
                   className="mt-1 block rounded-md bg-[#484A46]"
                   name="category"
-                  value={formData.category}
+                  value={formData?.category}
                   onChange={handleInputChange}
                 />
               </Field>
@@ -77,7 +92,7 @@ function EditForm() {
                 <Input
                   className="mt-1 block rounded-md bg-[#484A46]"
                   name="price"
-                  value={formData.price}
+                  value={formData?.price ? formData.price.split("$")[1] : 0}
                   onChange={handleInputChange}
                 />
               </Field>
@@ -86,7 +101,7 @@ function EditForm() {
                 <Input
                   className="mt-1 block rounded-md bg-[#484A46]"
                   name="quantity"
-                  value={formData.quantity}
+                  value={formData?.quantity}
                   onChange={handleInputChange}
                 />
               </Field>
@@ -95,24 +110,13 @@ function EditForm() {
                 <Input
                   className="mt-1 block rounded-md bg-[#484A46]"
                   name="value"
-                  value={formData.value}
+                  value={formData?.value ? formData.value.split("$")[1] : 0}
                   onChange={handleInputChange}
                 />
               </Field>
             </Fieldset>
             <div className="flex gap-4 justify-end">
-              <Button
-                className="text-[#9DA758]"
-                onClick={() => {
-                  setIsOpen(false);
-                  setFormData({
-                    category: "",
-                    price: "",
-                    quantity: "",
-                    value: "",
-                  });
-                }}
-              >
+              <Button className="text-[#9DA758]" onClick={onClose}>
                 Cancel
               </Button>
               <Button

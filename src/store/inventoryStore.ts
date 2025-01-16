@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface IItems {
+export interface IItem {
   name: string;
   category: string;
   quantity: string;
@@ -10,7 +10,7 @@ interface IItems {
 }
 
 interface IInventoryStore {
-  items: IItems[];
+  items: IItem[];
   isLoading: boolean;
   disableItem: (name: string) => void;
   editItem: (name: string, payload: object) => void;
