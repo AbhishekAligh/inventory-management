@@ -23,14 +23,12 @@ interface EditModalFormProps {
 function EditForm(props: EditModalFormProps) {
   const { initialState, onClose, onSave, isOpen } = props;
 
-  // State to hold form data
   const [formData, setFormData] = useState<IItem | null>(null);
 
   useEffect(() => {
     setFormData(initialState);
   }, [initialState]);
 
-  // Handler to update form state
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (!formData) {
@@ -53,7 +51,6 @@ function EditForm(props: EditModalFormProps) {
     });
   };
 
-  // Handler for Save button
   const handleSave = () => {
     console.log("Form Data:", formData);
     onSave(formData);
