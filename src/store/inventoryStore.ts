@@ -58,14 +58,19 @@ const useInventoryStore = create<IInventoryStore>((set) => ({
       items: state.items.filter((item) => item.name !== name),
     }));
   },
-  totalProducts: (): number => useInventoryStore.getState().items.length,
-  totalStoreValue: (): number =>
-    useInventoryStore
-      .getState()
-      .items.reduce(
+  totalProducts: (): number => {
+    const items = useInventoryStore.getState().items;
+    return items.filter((item) => !item.disabled).length;
+  },
+  totalStoreValue: (): number => {
+    const items = useInventoryStore.getState().items;
+    return items
+      .filter((item) => !item.disabled)
+      .reduce(
         (total, item) => total + parseFloat(item.value.replace("$", "")),
         0
-      ),
+      );
+  },
   outOfStock: (): number =>
     useInventoryStore.getState().items.filter((item) => item.quantity == "0")
       .length,
